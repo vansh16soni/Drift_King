@@ -9,7 +9,7 @@
 </head>
 <body>
   <div class="game-wrapper">
-    <!-- Top Bar: Title & Global Actions -->
+    <!-- Top bar with title and controls -->
     <header class="game-header">
       <div class="header-left">
         <button id="themeToggleBtn" class="pill-btn pill-btn-ghost" title="Toggle Theme" aria-label="Toggle Dark and Light theme">
@@ -31,7 +31,7 @@
       </div>
     </header>
 
-    <!-- Scoreboard: Simple Rounded Score Pills -->
+    <!-- Scoreboard pills -->
     <section class="scoreboard" aria-label="Scoreboard">
       <div class="score-pill">
         <span class="score-label">DRIFT SCORE</span>
@@ -50,11 +50,11 @@
       </div>
     </section>
 
-    <!-- Centered Viewport: Rectangular Canvas Frame with In-Canvas Overlays -->
+    <!-- Game canvas viewport -->
     <main class="canvas-viewport" id="viewport">
       <canvas id="gameCanvas" width="960" height="580"></canvas>
 
-      <!-- In-Frame Start Overlay -->
+      <!-- Start screen overlay -->
       <div class="overlay active" id="startOverlay">
         <div class="overlay-card">
           <div class="overlay-badge">ARCADE EDITION</div>
@@ -83,7 +83,7 @@
         </div>
       </div>
 
-      <!-- In-Frame Pause Overlay -->
+      <!-- Pause screen overlay -->
       <div class="overlay" id="pauseOverlay">
         <div class="overlay-card">
           <h2 class="overlay-title">PAUSED</h2>
@@ -99,7 +99,7 @@
         </div>
       </div>
 
-      <!-- In-Frame Game Over / Results Overlay -->
+      <!-- Results screen overlay -->
       <div class="overlay" id="resultsOverlay">
         <div class="overlay-card">
           <div class="overlay-badge">SESSION FINISHED</div>
@@ -126,7 +126,7 @@
       </div>
     </main>
 
-    <!-- Bottom Control Bar -->
+    <!-- Bottom controls bar -->
     <footer class="game-controls-bar">
       <div class="bar-left">
         <button id="pauseToggleBtn" class="pill-btn pill-btn-ghost" title="Pause Game (P / Esc)">
@@ -138,7 +138,7 @@
       </div>
 
       <div class="bar-center">
-        <!-- Track Selector Pill -->
+        <!-- Track selector -->
         <div class="select-pill-wrapper">
           <label for="trackSelect" class="select-prefix">TRACK:</label>
           <select id="trackSelect" class="select-pill" aria-label="Select Race Track">
@@ -148,7 +148,7 @@
           </select>
         </div>
 
-        <!-- Car Selector Pill -->
+        <!-- Car selector -->
         <div class="select-pill-wrapper">
           <label for="carSelect" class="select-prefix">CAR:</label>
           <select id="carSelect" class="select-pill" aria-label="Select Car Body">
@@ -161,7 +161,7 @@
       </div>
 
       <div class="bar-right">
-        <!-- Status Badge -->
+        <!-- Status badge -->
         <div class="status-badge status-ready" id="statusBadge">
           <span class="status-dot"></span>
           <span class="status-text" id="statusText">READY</span>
@@ -169,7 +169,7 @@
       </div>
     </footer>
 
-    <!-- Mobile On-Screen Touch Controls (Shown automatically on touch devices or small screens) -->
+    <!-- Mobile touch controls -->
     <div class="touch-controls" id="touchControls" aria-hidden="true">
       <div class="touch-cluster touch-left">
         <button class="touch-btn touch-btn-steer" id="touchSteerLeft" aria-label="Steer Left">◀</button>
@@ -184,13 +184,13 @@
     </div>
   </div>
 
-  <!-- Audio Elements (with safe fallback to procedural Web Audio API) -->
+  <!-- Fallback audio elements -->
   <audio id="audioMove" src="./music/move.mp3" preload="none"></audio>
   <audio id="audioScreech" src="./music/screech.mp3" preload="none"></audio>
   <audio id="audioCrash" src="./music/crash.mp3" preload="none"></audio>
   <audio id="audioBackground" src="./music/background.mp3" preload="none" loop></audio>
 
-  <!-- Game Engine Script -->
+  <!-- Game script -->
   <script src="./js/index.js"></script>
 </body>
 </html>

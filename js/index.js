@@ -1,15 +1,9 @@
-/**
- * DRIFT KING — Minimalist 2D Top-Down Arcade Drift Game
- * Pure HTML5 Canvas, CSS3, Vanilla ES6+ JavaScript.
- * Zero external libraries or frameworks.
- */
+// Drift King game engine
 
 (() => {
   'use strict';
 
-  /* ==========================================================================
-     1. STORAGE & CONSTANTS
-     ========================================================================== */
+  // Storage keys and game constants
   const STORAGE_KEYS = {
     BEST_SCORE: 'driftking_best_score',
     THEME: 'driftking_theme',
@@ -27,9 +21,7 @@
   const BANK_GRACE_TIME = 0.65; // Seconds after drift ends before banking points
   const MAX_REVERSE_RATIO = 0.35;
 
-  /* ==========================================================================
-     2. AUDIO SYSTEM (Synthesizer + Audio Element Fallbacks)
-     ========================================================================== */
+  // Audio manager: Web Audio synthesizer with sound element fallbacks
   class AudioManager {
     constructor() {
       this.muted = localStorage.getItem(STORAGE_KEYS.AUDIO_MUTED) === 'true';
@@ -81,7 +73,7 @@
       if (!this.ctx) return;
 
       try {
-        // --- Engine Hum Generator (Dual Sawtooth + Lowpass) ---
+        // Engine sound generator
         this.engineOsc = this.ctx.createOscillator();
         this.engineOsc.type = 'sawtooth';
         this.engineOsc.frequency.setValueAtTime(50, this.ctx.currentTime);
@@ -98,7 +90,7 @@
         this.engineGain.connect(this.ctx.destination);
         this.engineOsc.start();
 
-        // --- Tire Screech Generator (White Noise + Resonant Bandpass) ---
+        // Tire screech sound generator
         const bufferSize = this.ctx.sampleRate * 2;
         const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
@@ -243,9 +235,7 @@
     }
   }
 
-  /* ==========================================================================
-     3. TRACK DEFINITIONS & PROCEDURAL RENDERING
-     ========================================================================== */
+  // Track definitions and road rendering
   class TrackManager {
     constructor() {
       this.tracks = [
@@ -510,9 +500,7 @@
     }
   }
 
-  /* ==========================================================================
-     4. TIRE SMOKE & SKIDMARK PARTICLES
-     ========================================================================== */
+  // Particle system for smoke and sparks
   class ParticleSystem {
     constructor() {
       this.smokes = [];
@@ -604,9 +592,7 @@
     }
   }
 
-  /* ==========================================================================
-     5. CAR SPRITE LOADER & VECTOR RENDERER
-     ========================================================================== */
+  // Car sprite loader and vector renderer
   class CarRenderer {
     constructor() {
       this.images = {
@@ -655,7 +641,7 @@
       const isImgReady = img && img.complete && img.naturalWidth > 0;
 
       if (this.currentType !== 'vector' && isImgReady) {
-        // --- Image Sprite Rendering ---
+        // Draw car using image sprite
         const carLen = 52;
         const aspect = img.naturalHeight / img.naturalWidth;
         const carWid = Math.min(Math.max(carLen * aspect, 24), 30);
@@ -685,7 +671,7 @@
         ctx.fillRect(carLen / 2 - 3, carWid / 2 - 7, 3, 3);
         ctx.shadowBlur = 0;
       } else {
-        // --- Handcrafted Minimalist Arcade Vector Car ---
+        // Draw car using vector graphics
         this.drawVectorCar(ctx, car, isBraking, theme);
       }
 
@@ -795,9 +781,7 @@
     }
   }
 
-  /* ==========================================================================
-     6. CAR PHYSICS & SLIP-ANGLE ENGINE
-     ========================================================================== */
+  // Car physics and drift slip angle calculations
   class Car {
     constructor(x, y, angle) {
       this.reset(x, y, angle);
@@ -949,9 +933,7 @@
     }
   }
 
-  /* ==========================================================================
-     7. MASTER GAME ENGINE CONTROLLER
-     ========================================================================== */
+  // Main game engine controller
   class DriftKingEngine {
     constructor() {
       this.canvas = document.getElementById('gameCanvas');
@@ -1283,9 +1265,7 @@
       });
     }
 
-    /* ==========================================================================
-       8. MAIN GAME LOOP (Update & Render)
-       ========================================================================== */
+    // Main game loop: update physics and render frame
     loop(currentTime) {
       const dt = Math.min((currentTime - this.lastTime) / 1000, 0.1);
       this.lastTime = currentTime;
@@ -1312,7 +1292,7 @@
       const trackCheck = this.trackMgr.checkCarOnTrack(this.car.x, this.car.y);
 
       if (trackCheck.isWallHit) {
-        // --- WALL COLLISION PENALTY ---
+        // Wall collision penalty
         this.shakeIntensity = 14;
         this.audio.playCrash();
         this.particles.addSparks(this.car.x, this.car.y);
@@ -1332,7 +1312,7 @@
         this.bankGraceCountdown = 0;
         this.setStatus('WALL HIT!', 'wall');
       } else if (this.car.isDrifting) {
-        // --- ACTIVE DRIFT STATE ---
+        // Active drift state and scoring
         // Drift formula: Points = Speed * |sin(Slip Angle)| * Multiplier
         const driftPointsRate = speed * Math.abs(Math.sin(this.car.slipAngle)) * 4.6;
         this.comboScore += driftPointsRate * this.multiplier;
@@ -1373,7 +1353,7 @@
         // Stop tire screech sound
         this.audio.updateScreech(false, 0);
 
-        // --- BANK MECHANIC ---
+        // Bank mechanic: safe drift banking
         // Straightening the car without crashing banks the points into total score
         if (this.comboScore > 0) {
           this.bankGraceCountdown -= dt;
