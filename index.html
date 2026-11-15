@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DRIFT KING — Top-Down 2D Arcade Drift Game</title>
+  <meta name="description" content="Minimalist 2D top-down arcade drifting game built with pure HTML5 Canvas, CSS3, and Vanilla JavaScript.">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div class="game-wrapper">
+    <!-- Top Bar: Title & Global Actions -->
+    <header class="game-header">
+      <div class="header-left">
+        <button id="themeToggleBtn" class="pill-btn pill-btn-ghost" title="Toggle Theme" aria-label="Toggle Dark and Light theme">
+          <span class="pill-icon" id="themeIcon">🌙</span>
+          <span class="pill-text" id="themeLabel">DARK</span>
+        </button>
+      </div>
+
+      <div class="header-center">
+        <h1 class="game-title">DRIFT KING</h1>
+        <p class="game-subtitle">retro arcade · circuit racer</p>
+      </div>
+
+      <div class="header-right">
+        <button id="audioToggleBtn" class="pill-btn pill-btn-ghost" title="Toggle Sound" aria-label="Toggle Sound Effects">
+          <span class="pill-icon" id="audioIcon">🔊</span>
+          <span class="pill-text" id="audioLabel">AUDIO</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scoreboard: Simple Rounded Score Pills -->
+    <section class="scoreboard" aria-label="Scoreboard">
+      <div class="score-pill">
+        <span class="score-label">DRIFT SCORE</span>
+        <span class="score-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="score-pill score-pill-highlight" id="comboPill">
+        <span class="score-label">COMBO</span>
+        <div class="combo-details">
+          <span class="score-value" id="comboDisplay">0</span>
+          <span class="combo-multiplier" id="multiplierDisplay">1.0×</span>
+        </div>
+      </div>
+      <div class="score-pill">
+        <span class="score-label">BEST SCORE</span>
+        <span class="score-value" id="bestScoreDisplay">0</span>
+      </div>
+    </section>
+
+    <!-- Centered Viewport: Rectangular Canvas Frame with In-Canvas Overlays -->
+    <main class="canvas-viewport" id="viewport">
+      <canvas id="gameCanvas" width="960" height="580"></canvas>
+
+      <!-- In-Frame Start Overlay -->
+      <div class="overlay active" id="startOverlay">
+        <div class="overlay-card">
+          <div class="overlay-badge">ARCADE EDITION</div>
+          <h2 class="overlay-title">READY?</h2>
+          <p class="overlay-desc">Feather the throttle, pitch into the corner, and counter-steer to bank high-multiplier drift points.</p>
+          
+          <div class="key-hints">
+            <div class="key-group">
+              <span class="key-cap">W</span> / <span class="key-cap">↑</span> <span>Gas</span>
+            </div>
+            <div class="key-group">
+              <span class="key-cap">S</span> / <span class="key-cap">↓</span> <span>Brake</span>
+            </div>
+            <div class="key-group">
+              <span class="key-cap">A</span> <span class="key-cap">D</span> / <span class="key-cap">←</span> <span class="key-cap">→</span> <span>Steer</span>
+            </div>
+            <div class="key-group">
+              <span class="key-cap key-wide">SPACE</span> <span>Handbrake Drift</span>
+            </div>
+          </div>
+
+          <button id="startBtn" class="pill-btn pill-btn-primary pill-btn-large">
+            <span>START ENGINE</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- In-Frame Pause Overlay -->
+      <div class="overlay" id="pauseOverlay">
+        <div class="overlay-card">
+          <h2 class="overlay-title">PAUSED</h2>
+          <p class="overlay-desc">Tires cooling down on pit lane.</p>
+          <div class="overlay-actions">
+            <button id="resumeBtn" class="pill-btn pill-btn-primary pill-btn-large">
+              <span>RESUME</span>
+            </button>
+            <button id="restartBtn" class="pill-btn pill-btn-ghost">
+              <span>RESTART RUN</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- In-Frame Game Over / Results Overlay -->
+      <div class="overlay" id="resultsOverlay">
+        <div class="overlay-card">
+          <div class="overlay-badge">SESSION FINISHED</div>
+          <h2 class="overlay-title">RUN RESULTS</h2>
+          <div class="results-stats">
+            <div class="stat-box">
+              <span class="stat-label">FINAL SCORE</span>
+              <span class="stat-val" id="finalScoreVal">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">MAX COMBO</span>
+              <span class="stat-val" id="maxComboVal">1.0×</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">BEST RECORD</span>
+              <span class="stat-val" id="bestRecordVal">0</span>
+            </div>
+          </div>
+          <button id="driveAgainBtn" class="pill-btn pill-btn-primary pill-btn-large">
+            <span>DRIVE AGAIN</span>
+            <span class="btn-arrow">↺</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Control Bar -->
+    <footer class="game-controls-bar">
+      <div class="bar-left">
+        <button id="pauseToggleBtn" class="pill-btn pill-btn-ghost" title="Pause Game (P / Esc)">
+          <span id="pauseBtnLabel">PAUSE</span>
+        </button>
+        <button id="resetRunBtn" class="pill-btn pill-btn-ghost" title="Reset Current Run (R)">
+          <span>RESET</span>
+        </button>
+      </div>
+
+      <div class="bar-center">
+        <!-- Track Selector Pill -->
+        <div class="select-pill-wrapper">
+          <label for="trackSelect" class="select-prefix">TRACK:</label>
+          <select id="trackSelect" class="select-pill" aria-label="Select Race Track">
+            <option value="0">1 · OVAL & HAIRPIN</option>
+            <option value="1">2 · S-CHICANE</option>
+            <option value="2">3 · TOUGE CIRCUIT</option>
+          </select>
+        </div>
+
+        <!-- Car Selector Pill -->
+        <div class="select-pill-wrapper">
+          <label for="carSelect" class="select-prefix">CAR:</label>
+          <select id="carSelect" class="select-pill" aria-label="Select Car Body">
+            <option value="vector">PRO DRIFT MISSILE</option>
+            <option value="car1">CAR 1 (SPRITE)</option>
+            <option value="bmw">BMW M (SPRITE)</option>
+            <option value="car2">CAR 2 (SPRITE)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bar-right">
+        <!-- Status Badge -->
+        <div class="status-badge status-ready" id="statusBadge">
+          <span class="status-dot"></span>
+          <span class="status-text" id="statusText">READY</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile On-Screen Touch Controls (Shown automatically on touch devices or small screens) -->
+    <div class="touch-controls" id="touchControls" aria-hidden="true">
+      <div class="touch-cluster touch-left">
+        <button class="touch-btn touch-btn-steer" id="touchSteerLeft" aria-label="Steer Left">◀</button>
+        <button class="touch-btn touch-btn-steer" id="touchSteerRight" aria-label="Steer Right">▶</button>
+      </div>
+
+      <div class="touch-cluster touch-right">
+        <button class="touch-btn touch-btn-drift" id="touchDrift" aria-label="Handbrake Drift">DRIFT</button>
+        <button class="touch-btn touch-btn-brake" id="touchBrake" aria-label="Brake and Reverse">▼</button>
+        <button class="touch-btn touch-btn-gas" id="touchGas" aria-label="Gas / Accelerate">GAS ▲</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Elements (with safe fallback to procedural Web Audio API) -->
+  <audio id="audioMove" src="./music/move.mp3" preload="none"></audio>
+  <audio id="audioScreech" src="./music/screech.mp3" preload="none"></audio>
+  <audio id="audioCrash" src="./music/crash.mp3" preload="none"></audio>
+  <audio id="audioBackground" src="./music/background.mp3" preload="none" loop></audio>
+
+  <!-- Game Engine Script -->
+  <script src="./js/index.js"></script>
+</body>
+</html>
